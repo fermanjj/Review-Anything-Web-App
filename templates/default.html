@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% block html %}
+<html lang="en">
+{% block head %}
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %} | Review Anything</title>
+    {% include 'main_scripts.html' %}
+    {% block head_code %}{% endblock %}
+</head>
+{% endblock %}
+{% block body %}
+<body>
+{% block code_above_header %}{% endblock %}
+{% include 'header.html' %}
+{% block code_below_header %}{% endblock %}
+<div id="main" class="container">
+
+    {% block content %}{% endblock %}
+
+    {% block code_above_footer %}{% endblock %}
+    {% include 'footer.html' %}
+    {% block code_below_footer %}{% endblock %}
+</div>
+</body>
+{% endblock %}
+</html>
+{% endblock %}
