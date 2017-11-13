@@ -1,7 +1,26 @@
 {% extends 'default.html' %}
 {% block title %}Search Results{% endblock %}
 {% block content %}
-    {% for result in results %}
+    <table class="table table-sm table-hover">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Rating</th>
+                <th>By</th>
+                <th>Up/Down Votes</th>
+            </tr>
+        </thead>
+        {% for result in results %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('view_review', id_=result['id'], title=result['title']) }}">{{ result['title'] }}</a>
+                </td>
+                <td>{{ result['rating'] }}/10</td>
+                <td><a href="{{ url_for('view_user', id_=result['user_id'], name=result['name']) }}">{{ result['name'] }}</a></td>
+                <td>{{ result['upvotes'] }}/{{ result['downvotes'] }}</td>
+            </tr>
 
-    {% endfor %}
+
+        {% endfor %}
+    </table>
 {% endblock %}
