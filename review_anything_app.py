@@ -86,7 +86,7 @@ def create_review():
 
     url = url_for("view_review", id=results[0]['id'], title=results[0]['title'])
 
-    view_text = 'View it <a href="{}">here</a>.'.format(url)
+    view_text = ' View it <a href="{}">here</a>.'.format(url)
 
     flash_message('Your review has been created!' + view_text, 'success')
     return render_template('create_review.html')
@@ -97,15 +97,30 @@ def create_review():
 def view_review(id_, title):
     conn, cursor = create_db_conn()
     cursor.execute(
-        'select * from reviews where id = ?',
-        (id_,)
+        """
+        select r.id as [id], r.title as [title], r.rating as [rating],
+        r.review as [rating], u.name as [by], u.id as [user_id],
+        r.date_created as [date], r.upvotes as [up],
+        r.downvotes as [down]
+        from reviews as r
+        INNER JOIN users as u
+          on r.created_by = u.id
+        where r.id = ? and title = ?
+        """,
+        (id_, title)
     )
-    results = cursor_results(cursor)
+    results = cursor_results(cursor)[0]
     if len(results) == 0:
         flash_message('No review found.', 'danger')
         return render_template('view_review.html')
 
-    return render_template('view_review.html', title=title)
+    return render_template(
+        'view_review.html', title=results['title'],
+        by=results['by'], rating=results['rating'],
+        id=results['id'], user_id=results['user_id'],
+        date=results['date'], up=results['up'],
+        down=results['down']
+    )
 
 
 # noinspection SqlDialectInspection
