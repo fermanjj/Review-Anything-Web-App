@@ -100,7 +100,7 @@ def search(text):
         """
         select * from
           (
-            select reviews.*, u.name from reviews
+            select reviews.*, u.name, u.id as user_id from reviews
               INNER JOIN users as u
               on reviews.created_by = u.id
             where title like ? and
@@ -110,7 +110,7 @@ def search(text):
         UNION
         select * from
           (
-            select reviews.*, u.name from reviews
+            select reviews.*, u.name, u.id as user_id from reviews
               INNER JOIN users as u
               on reviews.created_by = u.id
             where review like ? AND
