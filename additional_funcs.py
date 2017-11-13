@@ -2,7 +2,8 @@ import json
 import os
 import bcrypt
 import sqlite3
-from flask import flash
+from flask import flash, session, request
+import base64
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 CONFIG_ARGS = json.loads(open(os.path.join(APP_ROOT, 'config.json')).read())
@@ -27,6 +28,33 @@ def cursor_results(cursor):
             output_d[col_name[0]] = col
         output.append(output_d)
     return output
+
+
+def verify_csrf():
+    """
+    Gets the csrf token from the form
+    and from the session cookie. Validates
+    that they match and returns True.
+    Otherwise if there's any missing data or
+    they don't match, flashes the appropriate
+    message and returns False.
+
+    :return: True if valid csrf token else False
+    """
+    csrf_token = request.form.get('csrf-token', '')
+    cookie_token = session.get('csrf-token', False)
+    if cookie_token is False:
+        flash_message('Your session has expired.', 'danger')
+        return False
+    if csrf_token != cookie_token:
+        flash_message('Invalid CSRF token.', 'danger')
+        return False
+    return True
+
+
+def make_csrf():
+    session['csrf-token'] = base64.b64encode(
+        os.urandom(16)).decode()
 
 
 def flash_message(msg, alert):
