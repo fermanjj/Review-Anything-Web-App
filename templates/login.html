@@ -11,6 +11,7 @@
             <label for="exampleInputPassword1">Password</label>
             <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
         </div>
+        <input type="hidden" name="csrf-token" value="{{ session.get('csrf-token', '') }}">
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 {% endblock %}
