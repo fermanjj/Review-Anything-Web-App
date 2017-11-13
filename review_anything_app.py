@@ -1,15 +1,15 @@
 from flask import (
-    Flask, render_template, request, url_for, redirect,
-    session)
+    Flask, render_template, request, url_for, redirect)
 from flask_login import (
     UserMixin, LoginManager, login_required,
-    login_user, logout_user)
+    login_user, logout_user, current_user)
 import os
 import json
 from additional_funcs import (
     create_db_conn, flash_message, cursor_results,
     check_pw, create_hash_pw, make_csrf, verify_csrf
 )
+from datetime import datetime
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 CONFIG_ARGS = json.loads(open(os.path.join(APP_ROOT, 'config.json')).read())
@@ -27,7 +27,10 @@ login_manager.init_app(app)
 
 
 class User(UserMixin):
-    pass
+    def __init__(self, id_, name, email):
+        self.id = id_
+        self.name = name
+        self.email = email
 
 
 # noinspection SqlDialectInspection
@@ -36,9 +39,73 @@ def user_loader(user_id):
     conn, cursor = create_db_conn()
     cursor.execute('select * from users where id = ?', (user_id,))
     results = cursor_results(cursor)
+    conn.close()
     if len(results) == 0:
         return
-    return User()
+    user = User(results[0]['id'], results[0]['name'], results[0]['email'])
+    return user
+
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return render_template('unauthorized.html')
+
+
+# noinspection SqlDialectInspection
+@app.route('/create_review', methods=['GET', 'POST'])
+@login_required
+def create_review():
+    if request.method == 'GET':
+        make_csrf()
+        return render_template('create_review.html')
+
+    form_title = request.form['title']
+    form_rating = request.form['rating']
+    form_review = request.form['review']
+
+    if not form_title or not form_rating or not form_review:
+        flash_message('Not all information provided.', 'danger')
+        return render_template('create_review.html')
+
+    if not verify_csrf():
+        return render_template('create_review.html')
+
+    # TODO: add captcha verification
+
+    conn, cursor = create_db_conn()
+    cursor.execute(
+        'insert into reviews VALUES (?,?,?,?,?,?,?,?)',
+        (None, form_title, form_rating, form_review,
+         current_user.id, datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+         0, 0)
+    )
+    conn.commit()
+    cursor.execute('select * from reviews ORDER BY id desc limit 1')
+    results = cursor_results(cursor)
+    conn.close()
+
+    url = url_for("view_review", id=results[0]['id'], title=results[0]['title'])
+
+    view_text = 'View it <a href="{}">here</a>.'.format(url)
+
+    flash_message('Your review has been created!' + view_text, 'success')
+    return render_template('create_review.html')
+
+
+# noinspection SqlDialectInspection
+@app.route('/review/<id_>/<title>')
+def view_review(id_, title):
+    conn, cursor = create_db_conn()
+    cursor.execute(
+        'select * from reviews where id = ?',
+        (id_,)
+    )
+    results = cursor_results(cursor)
+    if len(results) == 0:
+        flash_message('No review found.', 'danger')
+        return render_template('view_review.html')
+
+    return render_template('view_review.html', title=title)
 
 
 # noinspection SqlDialectInspection
@@ -66,8 +133,7 @@ def login():
     # TODO: add captcha verification
 
     if check_pw(form_password, results[0]['hash'], results[0]['salt']):
-        user = User()
-        user.id = results[0]['id']
+        user = User(results[0]['id'], results[0]['name'], results[0]['email'])
         login_user(user)
         flash_message('You are now logged in.', 'success')
         return render_template('home.html')
