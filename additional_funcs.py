@@ -19,7 +19,7 @@ def cursor_results(cursor):
     :return:
     """
     r = cursor.fetchall()
-    c = cursor.column_names
+    c = cursor.description
     output = []
     for row in r:
         output_d = {}
@@ -72,9 +72,9 @@ def create_hash_pw(pw, salt=None):
     :returns: hashed pw, salt
     """
     if salt is None:
-        salt = bcrypt.gensalt()
+        salt = bcrypt.gensalt().decode()
     combo = pw + salt + CONFIG_ARGS['MASTER_SECRET_KEY']
-    return bcrypt.hashpw(combo, salt), salt
+    return bcrypt.hashpw(combo.encode(), salt.encode()), salt
 
 
 def check_pw(pw, hashed_pw, salt):
