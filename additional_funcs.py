@@ -24,7 +24,7 @@ def cursor_results(cursor):
     for row in r:
         output_d = {}
         for col, col_name in zip(row, c):
-            output_d[col_name] = col
+            output_d[col_name[0]] = col
         output.append(output_d)
     return output
 
