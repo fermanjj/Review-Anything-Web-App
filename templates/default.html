@@ -15,6 +15,7 @@
 {% include 'header.html' %}
 {% block code_below_header %}{% endblock %}
 <div id="main" class="container">
+    {% block flashed_messages %}{% include 'flash.html' %}{% endblock %}
 
     {% block content %}{% endblock %}
 
