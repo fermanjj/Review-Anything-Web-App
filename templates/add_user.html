@@ -17,6 +17,7 @@
             <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
             <small id="exampleInputPassword1Help" class="form-text text-muted">All data is sent of HTTP so don't use this password anywhere else.</small>
         </div>
+        <input type="hidden" name="csrf-token" value="{{ session.get('csrf-token', '') }}">
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 {% endblock %}
