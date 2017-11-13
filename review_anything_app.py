@@ -1,5 +1,6 @@
 from flask import (
-    Flask, render_template, request, url_for, redirect)
+    Flask, render_template, request, url_for, redirect,
+    session)
 from flask_login import (
     UserMixin, LoginManager, login_required,
     login_user, logout_user)
@@ -7,7 +8,8 @@ import os
 import json
 from additional_funcs import (
     create_db_conn, flash_message, cursor_results,
-    check_pw, create_hash_pw)
+    check_pw, create_hash_pw, make_csrf, verify_csrf
+)
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 CONFIG_ARGS = json.loads(open(os.path.join(APP_ROOT, 'config.json')).read())
@@ -42,7 +44,9 @@ def user_loader(user_id):
 # noinspection SqlDialectInspection
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """A route for a user to login."""
     if request.method == 'GET':
+        make_csrf()
         return render_template('login.html')
 
     form_email = request.form['email']
@@ -55,6 +59,11 @@ def login():
     if len(results) == 0:
         flash_message('Incorrect email or password.', 'danger')
         return render_template('login.html')
+
+    if not verify_csrf():
+        return render_template('login.html')
+
+    # TODO: add captcha verification
 
     if check_pw(form_password, results[0]['hash'], results[0]['salt']):
         user = User()
@@ -70,7 +79,9 @@ def login():
 # noinspection SqlDialectInspection
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
+    """A route for creating new users."""
     if request.method == 'GET':
+        make_csrf()
         return render_template('add_user.html')
     form_email = request.form['email']
     form_name = request.form['name']
@@ -79,6 +90,11 @@ def add_user():
     if not form_email or not form_name or not form_password:
         flash_message('All fields need to be provided.', 'danger')
         return render_template('add_user.html')
+
+    if not verify_csrf():
+        return render_template('login.html')
+
+    # TODO: add captcha verification
 
     # check that the email doesn't already exist
     conn, cursor = create_db_conn()
@@ -106,6 +122,7 @@ def add_user():
 
 @app.route('/logout')
 def logout():
+    """The route to log out a user."""
     logout_user()
     return redirect(url_for('home'))
 
