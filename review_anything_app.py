@@ -93,13 +93,47 @@ def create_review():
 
 
 # noinspection SqlDialectInspection
+@app.route('/search/<text>')
+def search(text):
+    conn, cursor = create_db_conn()
+    cursor.execute(
+        """
+        select * from
+          (
+            select reviews.*, u.name from reviews
+              INNER JOIN users as u
+              on reviews.created_by = u.id
+            where title like ? and
+              (downvotes < 3 or upvotes > 0)
+            ORDER BY upvotes, date_created
+          )
+        UNION
+        select * from
+          (
+            select reviews.*, u.name from reviews
+              INNER JOIN users as u
+              on reviews.created_by = u.id
+            where review like ? AND
+              (downvotes < 3 or upvotes > 0)
+            ORDER BY upvotes, date_created
+          )
+        """,
+        ('%'+text+'%', '%'+text+'%')
+    )
+    results = cursor_results(cursor)
+    conn.close()
+
+    return render_template('search_results.html', results=results)
+
+
+# noinspection SqlDialectInspection
 @app.route('/review/<id_>/<title>')
 def view_review(id_, title):
     conn, cursor = create_db_conn()
     cursor.execute(
         """
         select r.id as [id], r.title as [title], r.rating as [rating],
-        r.review as [rating], u.name as [by], u.id as [user_id],
+        r.review as [review], u.name as [by], u.id as [user_id],
         r.date_created as [date], r.upvotes as [up],
         r.downvotes as [down]
         from reviews as r
@@ -109,18 +143,24 @@ def view_review(id_, title):
         """,
         (id_, title)
     )
-    results = cursor_results(cursor)[0]
+    results = cursor_results(cursor)
     if len(results) == 0:
         flash_message('No review found.', 'danger')
         return render_template('view_review.html')
+    results = results[0]
 
     return render_template(
         'view_review.html', title=results['title'],
         by=results['by'], rating=results['rating'],
         id=results['id'], user_id=results['user_id'],
         date=results['date'], up=results['up'],
-        down=results['down']
+        down=results['down'], review=results['review']
     )
+
+
+@app.route('/user/<id_>/<name>')
+def view_user(id_, name):
+    return 'coming soon'
 
 
 # noinspection SqlDialectInspection
