@@ -1,0 +1,7 @@
+{
+  "DB_NAME": "review_anything_db.sqlite",
+  "DEBUG": true,
+  "PORT": 5000,
+  "HOST": "0.0.0.0",
+  "MASTER_SECRET_KEY": "super secret key!!!"
+}
