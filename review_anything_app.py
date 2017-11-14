@@ -9,6 +9,7 @@ from additional_funcs import (
     create_db_conn, flash_message, cursor_results,
     check_pw, create_hash_pw, make_csrf, verify_csrf
 )
+import urllib.parse
 from datetime import datetime
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -177,6 +178,64 @@ def view_user(id_, name):
     conn.close()
 
     return render_template('user_page.html', results=results)
+
+
+# noinspection SqlDialectInspection
+@app.route('/vote')
+@login_required
+def vote():
+
+    review_id = request.args['id']
+    up_down = request.args['ud']
+
+    if up_down not in ('0', '1'):
+        flash_message('Invalid options.', 'danger')
+        return redirect(url_for('home'))
+
+    # TODO: figure out a better way to do this
+    # my idea here was to re-route the user to
+    # the page they came from
+    referrer = request.referrer
+    if referrer is None:
+        next_url = url_for('home')
+    else:
+        referrer_parsed = urllib.parse.urlparse(referrer)
+        next_url = urllib.parse.urlunparse(
+            ('', '', referrer_parsed.path, '',
+             referrer_parsed.query, '')
+        )
+
+    conn, cursor = create_db_conn()
+    cursor.execute(
+        'select * from votes where review_id = ? and user_id = ?',
+        (review_id, current_user.id)
+    )
+    results = cursor_results(cursor)
+    if len(results) != 0:
+        conn.close()
+        flash_message("You've already voted on this review.", 'danger')
+        return redirect(next_url)
+
+    cursor.execute(
+        'insert into votes VALUES (?,?,?,?)',
+        (None, review_id, current_user.id, up_down)
+    )
+    up_or_down = 'upvotes' if up_down == '1' else 'downvotes'
+    cursor.execute(
+        """
+        update reviews set
+        {up_down} = (
+            select {up_down} from reviews where id = ?
+        ) + 1
+        WHERE id = ?
+        """.format(up_down=up_or_down),
+        (review_id, review_id)
+    )
+    conn.commit()
+    conn.close()
+
+    flash_message('Your vote has been posted.', 'success')
+    return redirect(next_url)
 
 
 # noinspection SqlDialectInspection
