@@ -93,8 +93,10 @@ def create_review():
 
 
 # noinspection SqlDialectInspection
-@app.route('/search/<text>')
-def search(text):
+@app.route('/search')
+def search():
+    search_text = request.args['keyword']
+
     conn, cursor = create_db_conn()
     cursor.execute(
         """
@@ -118,7 +120,7 @@ def search(text):
             ORDER BY upvotes, date_created
           )
         """,
-        ('%'+text+'%', '%'+text+'%')
+        ('%'+search_text+'%', '%'+search_text+'%')
     )
     results = cursor_results(cursor)
     conn.close()
@@ -158,9 +160,23 @@ def view_review(id_, title):
     )
 
 
+# noinspection SqlDialectInspection
 @app.route('/user/<id_>/<name>')
 def view_user(id_, name):
-    return 'coming soon'
+    conn, cursor = create_db_conn()
+    cursor.execute(
+        """
+        select reviews.*, u.name, u.id as user_id from reviews
+        INNER JOIN users as u
+        on reviews.created_by = u.id
+        where u.id = ? and name = ?
+        """,
+        (id_, name)
+    )
+    results = cursor_results(cursor)
+    conn.close()
+
+    return render_template('user_page.html', results=results)
 
 
 # noinspection SqlDialectInspection
