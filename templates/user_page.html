@@ -1,0 +1,27 @@
+{% extends 'default.html' %}
+{% block title %}User{% endblock %}
+{% block content %}
+    <p>Reviews written by: <strong class="text-success"></strong></p>
+    <table class="table table-sm table-hover">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Rating</th>
+                <th>By</th>
+                <th>Up/Down Votes</th>
+            </tr>
+        </thead>
+        {% for result in results %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('view_review', id_=result['id'], title=result['title']) }}">{{ result['title'] }}</a>
+                </td>
+                <td>{{ result['rating'] }}/10</td>
+                <td>{{ result['name'] }}</td>
+                <td>{{ result['upvotes'] }}/{{ result['downvotes'] }}</td>
+            </tr>
+
+
+        {% endfor %}
+    </table>
+{% endblock %}
