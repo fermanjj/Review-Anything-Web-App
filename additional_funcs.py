@@ -83,7 +83,9 @@ def create_db_conn():
 
     :return:
     """
-    conn = sqlite3.connect(CONFIG_ARGS['DB_NAME'])
+    conn = sqlite3.connect(os.path.join(
+        APP_ROOT, CONFIG_ARGS['DB_NAME']
+    ))
     cursor = conn.cursor()
     return conn, cursor
 
