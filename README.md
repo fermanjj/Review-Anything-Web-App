@@ -13,3 +13,19 @@ This app was built using Python 3.6 so I would suggest that as the version.
 * `pip install -r requirements.txt`
 * `python review_anything_app.py`
 
+## Features
+
+* Creating Users
+* Login/Logout
+* Write Reviews
+* Up/Down vote reviews
+* Comment on reviews _(coming soon)_
+
+## Tech Implementations
+
+* Persistent data to a database
+* Sessions
+* CSRF Tokens
+* SQL Injection prevention
+* Password hashing
+* Design templates
