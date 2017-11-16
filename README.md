@@ -33,7 +33,7 @@ This app was built using Python 3.6 so I would suggest that as the version.
 
 ## Setup on pythonanywhere.com
 
-* Create an account on [pythonanywhere.com](www.pythonanywhere.com) *(a free account will work)*
+* Create an account on [pythonanywhere.com](https://www.pythonanywhere.com) *(a free account will work)*
 
 * Open a new bash console
 
