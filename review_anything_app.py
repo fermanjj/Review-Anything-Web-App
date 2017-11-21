@@ -146,7 +146,7 @@ def search():
             ORDER BY upvotes, date_created
           )
         """,
-        ('%'+search_text+'%', '%'+search_text+'%')
+        ('%'+search_text+'%', '%'+search_text+'%', '%'+search_text+'%')
     )
     results = cursor_results(cursor)
     conn.close()
