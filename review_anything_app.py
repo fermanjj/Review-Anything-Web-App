@@ -111,38 +111,8 @@ def search():
             FROM reviews
               INNER JOIN users AS u
                 ON reviews.created_by = u.id
-            WHERE title LIKE ? AND
-                  (downvotes < 3 OR upvotes > 0)
-            ORDER BY upvotes, date_created
-          )
-        UNION
-        SELECT *
-        FROM
-          (
-            SELECT
-              reviews.*,
-              u.name,
-              u.id AS user_id
-            FROM reviews
-              INNER JOIN users AS u
-                ON reviews.created_by = u.id
-            WHERE review LIKE ? AND
-                  (downvotes < 3 OR upvotes > 0)
-            ORDER BY upvotes, date_created
-          )
-        UNION
-        SELECT *
-        FROM
-          (
-            SELECT
-              reviews.*,
-              u.name,
-              u.id AS user_id
-            FROM reviews
-              INNER JOIN users AS u
-                ON reviews.created_by = u.id
-            WHERE u.name LIKE ? AND
-                  (downvotes < 3 OR upvotes > 0)
+            WHERE title LIKE ? OR review LIKE ? OR name LIKE ?
+              AND (downvotes < 3 OR upvotes > 0)
             ORDER BY upvotes, date_created
           )
         """,
