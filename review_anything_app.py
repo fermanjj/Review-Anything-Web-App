@@ -85,7 +85,7 @@ def create_review():
     results = cursor_results(cursor)
     conn.close()
 
-    url = url_for("view_review", id=results[0]['id'], title=results[0]['title'])
+    url = url_for("view_review", id_=results[0]['id'], title=results[0]['title'])
 
     view_text = ' View it <a href="{}">here</a>.'.format(url)
 
