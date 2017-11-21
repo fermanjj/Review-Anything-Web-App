@@ -14,8 +14,8 @@
             <div class="card-body">
                 <h6>By <a href="{{ url_for('view_user', id_=user_id, name=by) }}">{{ by }}</a></h6>
                 <p class="card-text">{{ review }}</p>
-                <a class="btn btn-primary">Upvote <span class="badge badge-light">{{ up }}</span></a>
-                <a class="btn btn-danger">Downvote <span class="badge badge-light">{{ down }}</span></a>
+                <a class="btn btn-primary" href="{{ url_for('vote') }}?id={{ id }}&ud=1">Upvote <span class="badge badge-light">{{ up }}</span></a>
+                <a class="btn btn-danger" href="{{ url_for('vote') }}?id={{ id }}&ud=0">Downvote <span class="badge badge-light">{{ down }}</span></a>
             </div>
             <div class="card-footer text-muted">Posted: {{ date }}</div>
         </div>
