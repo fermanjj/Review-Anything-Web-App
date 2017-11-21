@@ -101,23 +101,48 @@ def search():
     conn, cursor = create_db_conn()
     cursor.execute(
         """
-        select * from
+        SELECT *
+        FROM
           (
-            select reviews.*, u.name, u.id as user_id from reviews
-              INNER JOIN users as u
-              on reviews.created_by = u.id
-            where title like ? and
-              (downvotes < 3 or upvotes > 0)
+            SELECT
+              reviews.*,
+              u.name,
+              u.id AS user_id
+            FROM reviews
+              INNER JOIN users AS u
+                ON reviews.created_by = u.id
+            WHERE title LIKE ? AND
+                  (downvotes < 3 OR upvotes > 0)
             ORDER BY upvotes, date_created
           )
         UNION
-        select * from
+        SELECT *
+        FROM
           (
-            select reviews.*, u.name, u.id as user_id from reviews
-              INNER JOIN users as u
-              on reviews.created_by = u.id
-            where review like ? AND
-              (downvotes < 3 or upvotes > 0)
+            SELECT
+              reviews.*,
+              u.name,
+              u.id AS user_id
+            FROM reviews
+              INNER JOIN users AS u
+                ON reviews.created_by = u.id
+            WHERE review LIKE ? AND
+                  (downvotes < 3 OR upvotes > 0)
+            ORDER BY upvotes, date_created
+          )
+        UNION
+        SELECT *
+        FROM
+          (
+            SELECT
+              reviews.*,
+              u.name,
+              u.id AS user_id
+            FROM reviews
+              INNER JOIN users AS u
+                ON reviews.created_by = u.id
+            WHERE u.name LIKE ? AND
+                  (downvotes < 3 OR upvotes > 0)
             ORDER BY upvotes, date_created
           )
         """,
