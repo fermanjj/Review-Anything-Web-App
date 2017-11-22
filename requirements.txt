@@ -2,3 +2,4 @@ bcrypt
 flask
 flask-login
 requests
+beautifulsoup4
