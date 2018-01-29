@@ -37,7 +37,7 @@ This app was built using Python 3.6 so I would suggest that as the version.
 
 * Open a new bash console
 
-* Clone this repo `git clone https://fermanjj@bitbucket.org/fermanjj/review-anything-web-app.git`
+* Clone this repo `git clone https://github.com/fermanjj/Review-Anything-Web-App.git`
 
 * Change directories to the new repo `cd review-anything-web-app/`
 
