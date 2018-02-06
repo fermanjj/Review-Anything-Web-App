@@ -318,9 +318,28 @@ def logout():
     return redirect(url_for('home'))
 
 
+# noinspection SqlDialectInspection
 @app.route('/')
 def home():
-    return render_template('home.html')
+    conn, cursor = create_db_conn()
+    cursor.execute("""
+    SELECT *
+    FROM
+      (
+        SELECT
+          reviews.*,
+          u.name,
+          u.id AS user_id
+        FROM reviews
+          INNER JOIN users AS u
+            ON reviews.created_by = u.id
+          WHERE (downvotes < 3 OR upvotes > 0)
+        ORDER BY upvotes DESC , date_created DESC
+        LIMIT 50
+      )
+    """)
+    results = cursor_results(cursor)
+    return render_template('home.html', reviews=results)
 
 
 if __name__ == '__main__':
