@@ -4,6 +4,30 @@
 
     <h1>Home Page</h1>
     <p>Welcome to review anything, a web app where you can literally review anything!</p>
-    <p>This is a mock website and all it's source code is located <a href="https://github.com/fermanjj/Review-Anything-Web-App">here</a>.</p>
+    <p>This is a mock website and all it's source code is located <a
+            href="https://github.com/fermanjj/Review-Anything-Web-App">here</a>.</p>
+
+    <div class="row" style="margin-top: 15px">
+        <div class="col-md-12">
+            <div class="card">
+                <h4 class="card-header">Newest Top Voted</h4>
+                <div class="card-body">
+                    <div class="row">
+                    {% for review in reviews %}
+                        <div class="col-md-3" style="margin-top: 5px;margin-bottom: 5px">
+                            <div class="card">
+                                <div class="card-body">
+                                    <a href="{{ url_for('view_review', id_=review['id'], title=review['title']) }}">{{ review['title'] }}</a>
+                                    <span class="badge badge-pill badge-primary float-right">{{ review['upvotes'] }}/{{ review['downvotes'] }}</span>
+                                    <footer class="blockquote-footer"><a class="text-secondary" href="{{ url_for('view_user', id_=review['user_id'], name=review['name']) }}">{{ review['name'] }}</a></footer>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
