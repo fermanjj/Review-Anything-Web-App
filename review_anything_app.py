@@ -170,9 +170,16 @@ def view_user(id_, name):
         (id_, name)
     )
     results = cursor_results(cursor)
+
+    cursor.execute(
+        "select * from users where id = ? and name = ?",
+        (id_, name)
+    )
+    user = cursor_results(cursor)[0]
+
     conn.close()
 
-    return render_template('user_page.html', results=results)
+    return render_template('user_page.html', results=results, user=user)
 
 
 # noinspection SqlDialectInspection
