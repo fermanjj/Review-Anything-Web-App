@@ -1,7 +1,7 @@
 {% extends 'default.html' %}
 {% block title %}User{% endblock %}
 {% block content %}
-    <p>Reviews written by: <strong class="text-success"></strong></p>
+    <p>Reviews written by: <strong class="text-primary">{{ user.name }}</strong></p>
     <table class="table table-sm table-hover">
         <thead>
             <tr>
