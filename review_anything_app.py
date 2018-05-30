@@ -268,7 +268,7 @@ def login():
         user = User(results[0]['id'], results[0]['name'], results[0]['email'])
         login_user(user)
         flash_message('You are now logged in.', 'success')
-        return render_template('home.html')
+        return redirect(url_for('home'))
 
     flash_message('Incorrect email or password.', 'danger')
     return render_template('login.html')
